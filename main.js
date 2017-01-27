@@ -1,15 +1,17 @@
-const {app, BrowserWindow} = require('electron')
+const electron = require('electron')
+const {app, BrowserWindow} = electron
 const path = require('path')
 const url = require('url')
+var WebSocket = require('ws')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
 
-function createWindow () {
+function createWindow (width, height) {
   // Create the browser window.
-  win = new BrowserWindow({width: 800, height: 20, frame: false, resizable: true})
-
+  win = new BrowserWindow({width: width, height: height, frame: false, resizable: true})
+  win.setPosition(0, 0)
   // and load the index.html of the app.
   win.loadURL(url.format({
     pathname: path.join(__dirname, 'index.html'),
@@ -32,7 +34,25 @@ function createWindow () {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', function() {
+  var ws = WebSocket("ws://localhost:8888/zwm")
+
+  ws.on('open', function() {
+    console.log("connected")
+  })
+
+  ws.on('message', function(data, flags) {
+    var type = data.substring(0, 1)
+    var msg = data.substring(1, data.length).trim()
+    console.log(data)
+    console.log(type)
+    console.log(msg)
+  })
+
+  var {width, height} = electron.screen.getPrimaryDisplay().workAreaSize
+  height = 20
+  createWindow(width, height)
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
