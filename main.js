@@ -1,8 +1,21 @@
 const electron = require('electron')
 const {app, BrowserWindow} = electron
+const {ipcMain} = electron
 const path = require('path')
 const url = require('url')
 var WebSocket = require('ws')
+
+
+// zwm-bar
+var bar_senders = []
+
+ipcMain.on('connect', (event, arg) => {
+	bar_senders.push(event.sender)
+	event.sender.send('spaces', spaces)
+  console.log('renderer conneected')  // prints "ping"
+})
+
+var spaces = ""
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -37,16 +50,23 @@ function createWindow (width, height) {
 app.on('ready', function() {
   var ws = WebSocket("ws://localhost:8888/zwm")
 
-  ws.on('open', function() {
-    console.log("connected")
-  })
 
   ws.on('message', function(data, flags) {
     var type = data.substring(0, 1)
     var msg = data.substring(1, data.length).trim()
-    console.log(data)
-    console.log(type)
-    console.log(msg)
+
+		console.log("got message")
+
+		spaces = msg
+
+		for (i = 0; i < bar_senders.length; i++) {
+			bar_senders[i].send('spaces', msg)
+		}
+  })
+
+  ws.on('open', function() {
+		console.log("socket connected")
+		ws.send('connect')
   })
 
   var {width, height} = electron.screen.getPrimaryDisplay().workAreaSize

@@ -9,6 +9,7 @@
   "author": "Rafi Khan",
   "license": "MIT",
   "dependencies": {
+    "electron": "^1.4.15",
     "ws": "^1.1.1"
   }
 }

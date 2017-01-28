@@ -1,7 +1,13 @@
 body {
-    -webkit-app-region: drag;
+	-webkit-app-region: drag;
 }
-body, html { 
-    overflow-x: hidden; 
-    overflow-y: auto;
+body, html {
+	overflow-x: hidden;
+	overflow-y: auto;
+	margin: 0px;
+}
+
+#spaces {
+	margin-top: 0px;
+	margin-bottom: 0px;
 }
